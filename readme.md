@@ -66,3 +66,39 @@ CREATE TABLE oauth_jwt (
 );
 ```
 
+Additionally, the OSSEC server needs to be put into database mode.  Your MySQL database needs the following schema:
+
+```
+mysql> create database ossec;
+
+mysql> grant INSERT,SELECT,UPDATE,CREATE,DELETE,EXECUTE on ossec.* to ossecuser@<ossec ip>;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> set password for ossecuser@<ossec ip>=PASSWORD('ossecpass');
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> flush privileges;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> quit
+
+# mysql -u root -p ossec < mysql.schema
+```
+
+And your OSSEC config page needs the following entry:
+
+```
+<ossec_config>
+    <database_output>
+        <hostname>192.168.2.30</hostname>
+        <username>ossecuser</username>
+        <password>ossecpass</password>
+        <database>ossec</database>
+        <type>mysql</type>
+    </database_output>
+</ossec_config>
+```
+
+After the config is modified, OSSEC will need to be restarted.
+
+api/db.php will need to be modified to match OSSEC database credentials.
